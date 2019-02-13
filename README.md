@@ -5,5 +5,10 @@ Mobile application as applied to the challenge of missing persons cases
 React Native
 
 #### Build and run
-`npm install --save react-native-elements`  
+Run the following commands at the root of the project:
+
+`npm install --save react-native-elements` 
+
+`npm install firebase --save`
+
 `npm start`
