@@ -20,7 +20,7 @@ export default class MapScreen extends React.Component {
 
     return (
       <ScrollView style={styles.container}>
-        <SearchBar lightTheme placeholder="Search" onChangeText={this.updateSearch} value={search}/>
+        <SearchBar platform="ios" placeholder="Search" onChangeText={this.updateSearch} value={search}/>
         <View style={styles.mapContainer}>
           <Image source={require('../assets/images/map.png')} style={styles.mapImage}/>
         </View>
