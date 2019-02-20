@@ -1,5 +1,12 @@
 import React from 'react';
-import { FlatList, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SearchBar } from 'react-native-elements';
 
 class SearchResultPerson extends React.Component {
@@ -16,15 +23,70 @@ class SearchResultPerson extends React.Component {
   }
 }
 
-export default class SearchScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Search',
+class SearchBySelector extends React.Component {
+  state = {
+    searchBy: 'Name',
+  }
+
+  toggleSelector = (searchBy) => {
+    this.setState({
+      searchBy: searchBy
+    })
   };
 
+  selectName = (value) => { this.toggleSelector('Name'); this.props.toggleSelector('Name'); };
+  selectAge = (value) => { this.toggleSelector('Age'); this.props.toggleSelector('Age'); };
+  selectLocation = (value) => { this.toggleSelector('Location'); this.props.toggleSelector('Location'); };
+
+  render () {
+    return (
+      <View style={styles.searchBySelector}>
+        <Text style={styles.searchByLabel}>Searching by: </Text>
+        <Text
+          style={[styles.searchByOption,
+            this.state.searchBy === 'Name' ? styles.searchByOptionSelected : null]}
+          onPress={this.selectName}
+          disabled={this.state.searchBy === 'Name'}
+        >
+          Name
+        </Text>
+        <Text
+          style={[styles.searchByOption,
+            this.state.searchBy === 'Age' ? styles.searchByOptionSelected : null]}
+          onPress={this.selectAge}
+          disabled={this.state.searchBy === 'Age'}
+        >
+          Age
+        </Text>
+        <Text
+          style={[styles.searchByOption,
+            this.state.searchBy === 'Location' ? styles.searchByOptionSelected : null]}
+          onPress={this.selectLocation}
+          disabled={this.state.searchBy === 'Location'}
+        >
+          Location
+        </Text>
+      </View>
+    )
+  }
+}
+
+export default class SearchScreen extends React.Component {
   state = {
     searchText: '',
     isSearchResults: false,
     searchResults: [],
+    searchBy: 'Name',
+  }
+
+  static navigationOptions = {
+    title: 'Search',
+  };
+
+  toggleSelector = (searchBy) => {
+    this.setState({
+      searchBy: searchBy
+    })
   };
 
   updateSearch = searchText => {
@@ -64,7 +126,7 @@ export default class SearchScreen extends React.Component {
     this.setState({
       searchText: searchText,
       isSearchResults: isSearchResults,
-      searchResults: results
+      searchResults: results,
     });
   };
 
@@ -72,16 +134,17 @@ export default class SearchScreen extends React.Component {
     return (
       <ScrollView style={styles.container}>
         <SearchBar
-          platform="ios"
-          placeholder="Search"
+          platform='ios'
+          placeholder='Search'
           onChangeText={this.updateSearch}
           value={this.state.searchText}
         />
-        { 
+        <SearchBySelector toggleSelector={this.toggleSelector}/>
+        {
           this.state.isSearchResults &&
           <View>
             <Text style={styles.searchTitle}>
-              Search for '{this.state.searchText}'
+              Search for '{this.state.searchText}' by {this.state.searchBy}
             </Text>
             <FlatList
               data={this.state.searchResults}
@@ -113,6 +176,25 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  /* 'Search by' selector */
+  searchBySelector: {
+    margin: 10,
+    flexDirection: 'row',
+    fontSize: 16,
+  },
+  searchByLabel: {
+    marginVertical: 5,
+  },
+  searchByOption: {
+    marginHorizontal: 2,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    backgroundColor: '#f4f4f4',
+  },
+  searchByOptionSelected: {
+    backgroundColor: '#ddd',
+  },
+  /* Missing person list */
   personContainer: {
     backgroundColor: '#eee',
     marginHorizontal: 10,
