@@ -5,11 +5,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableHighlight,
   View,
 } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 
-class SearchResultPerson extends React.Component {
+class SearchResultPerson extends TouchableHighlight {
   render() {
     return (
       <View style={styles.personContainer}>
@@ -93,30 +94,35 @@ export default class SearchScreen extends React.Component {
     var isSearchResults = searchText !== '';
     var results = [
       {
+        casenum: 1,
         name: 'John Smith',
         age: 36,
         location: 'Los Angeles, CA',
         imgUrl: '../assets/images/person-icon.png',
       },
       {
+        casenum: 2,
         name: 'Jane Smith',
         age: 35,
         location: 'San Francisco, CA',
         imgUrl: '../assets/images/person-icon.png',
       },
       {
+        casenum: 3,
         name: 'Helena Wu',
         age: 20,
         location: 'Pasadena, CA',
         imgUrl: '../assets/images/person-icon.png',
       },
       {
+        casenum: 4,
         name: 'Pamela Zhang',
         age: 20,
         location: 'Pasadena, CA',
         imgUrl: '../assets/images/person-icon.png',
       },
       {
+        casenum: 5,
         name: 'Sharon Chen',
         age: 20,
         location: 'Pasadena, CA',
@@ -131,6 +137,8 @@ export default class SearchScreen extends React.Component {
   };
 
   render() {
+    const { navigate } = this.props.navigation;
+
     return (
       <ScrollView style={styles.container}>
         <SearchBar
@@ -151,12 +159,14 @@ export default class SearchScreen extends React.Component {
               keyExtractor={(item, index) => item.name}
               renderItem={
                 ({item}) =>
-                  <SearchResultPerson
-                    name={item.name}
-                    age={item.age}
-                    location={item.location}
-                    imgUrl={item.imgUrl}
-                  />
+                  <TouchableHighlight onPress={() => navigate('Person', {casenum: item.casenum})}>
+                    <SearchResultPerson
+                      name={item.name}
+                      age={item.age}
+                      location={item.location}
+                      imgUrl={item.imgUrl}
+                    />
+                  </TouchableHighlight>
               }
             />
           </View>

@@ -32,6 +32,10 @@ import { SearchBar } from 'react-native-elements';
 // }
 
 export default class App extends React.Component {
+  static navigationOptions = {
+    title: 'Map',
+  };
+
   render() {
     return (
       <MapView
