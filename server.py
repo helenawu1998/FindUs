@@ -4,10 +4,6 @@ import pandas, csv, sqlite3, json
 # app = Flask(__name__)
 
 # @app.route('/')
-# def hello_world():
-#     return 'Hello, World!'
-
-# TODO: filter data and return search results
 
 # Column Names: ['Case Number', 'DLC', 'Last Name', 'First Name', 'Missing Age', 'City', 'County', 'State', 'Sex', 'Race / Ethnicity', 'Date Modified']
 
@@ -59,12 +55,13 @@ def select_searchstr(conn, col, search_str):
     result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"State\""
     if col == "Name":
         # Search for search string in last name, first name
-        statement = "SELECT " + result_schema + " FROM missing_persons WHERE CONTAINS(\"Last Name\", " + search_str + ") OR CONTAINS(\"First Name\", " + search_str + ")"
+        statement = "SELECT " + result_schema + " FROM missing_persons WHERE instr(\"Last Name\", \"" + search_str + "\") > 0 OR instr(\"First Name\", \"" + search_str + "\") > 0"
     elif col == "Age":
-        statement = "SELECT " + result_schema + " FROM missing_persons WHERE CONTAINS(\"Missing Age\", " + search_str + ")"
+        statement = "SELECT " + result_schema + " FROM missing_persons WHERE instr(\"Missing Age\", \"" + search_str + "\") > 0"
     elif col == "Location":
-        statement = "SELECT " + result_schema + " FROM missing_persons WHERE CONTAINS(\"City\", " + search_str + ") OR CONTAINS(\"State\", " + search_str + ")"
+        statement = "SELECT " + result_schema + " FROM missing_persons WHERE instr(\"City\", \"" + search_str + "\") > 0 OR instr(\"State\", \"" + search_str + "\") > 0"
 
+    print(statement)
     cur.execute(statement)
 
     rows = cur.fetchall()
@@ -124,18 +121,19 @@ def main():
         print("Querying case that matches case number")
         # Test specific case for Los Angeles dataset
         # casenum = "\"MP26951\"" 
-
-        print("Querying case that matches search string Detr in Location ")
-        # Test specific case for Los Angeles dataset
-        # casenum = "\"MP26951\"" 
-        search_str = "Detr"
-        rows = select_searchstr(conn, "Location", search_str)
-
         # Test specific case for USA dataset
         casenum = "\"MP20931\"" 
         rows = select_casenumber(conn, casenum)
 
-        print("Printing all as JSON")
+        print("Querying case that matches search string ")
+        search_str = "Detr"
+        rows = select_searchstr(conn, "Location", search_str)
+        search_str = "arl"
+        rows = select_searchstr(conn, "Name", search_str)
+        search_str = "20"
+        rows = select_searchstr(conn, "Age", search_str)
+
+        print("Printing last result as JSON")
         # Need result schema as a list to turn collected rows into JSON properly
         schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
         json_msg = return_json(conn, schema, rows)
