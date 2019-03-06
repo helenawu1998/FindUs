@@ -1,7 +1,8 @@
 import React from 'react';
 import {
-  FlatList,
+  Button,
   Image,
+  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,45 +12,58 @@ import {
 export default class PersonScreen extends React.Component {
   state = {
     casenum: '',
-    DLC: '',
-    last_name: '',
-    first_name: '',
-    miss_age: '',
-    city: '',
-    county: '',
-    state: '',
-    sex: '',
-    race: '',
-    date_mod: '',
-    imgUrl: '',
   }
 
   static navigationOptions = ({ navigation }) => {
     return {
-      title: 'Case #' + navigation.getParam('casenum').toString(),
+      title: 'NamUs Case #' + navigation.getParam('casenum').toString(),
     };
   };
 
   componentWillMount() {
     this.state.casenum = this.props.navigation.state.params.casenum;
-    // TODO: fetch case data from database!
-    this.state.DLC = 'DLC';
-    this.state.last_name = 'Wu';
-    this.state.first_name = 'Helena';
-    this.state.miss_age = '20';
-    this.state.city = 'Pasadena';
-    this.state.county = 'Los Angeles';
-    this.state.state = 'CA';
-    this.state.sex = 'F';
-    this.state.race = 'Chinese';
-    this.state.date_mod = 'Feb 28, 2019';
-    this.state.imgUrl = '../assets/images/person-icon.png';
+  }
+
+  componentDidMount() {
+    return fetch('http://127.0.0.1:5000/case-number?casenum=' + this.state.casenum)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState(responseJson[0]);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   render() {
     return (
       <ScrollView style={styles.container}>
-        <Text style={styles.title}>{this.state.first_name} {this.state.last_name}</Text>
+        <View style={{justifyContent: 'center', alignItems: 'center',}}>
+          <Image source={require('../assets/images/person-icon.png')} style={styles.img}/>
+          <Text style={styles.name}>{this.state["First Name"]} {this.state["Last Name"]}</Text>
+          <Text>
+            <Text style={styles.label}>Missing from: </Text>
+            {this.state["City"]}, {this.state["County"]}, {this.state["State"]}
+          </Text>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Case Information</Text>
+          <Text><Text style={styles.label}>Date of last contact:</Text> {this.state["DLC"]}</Text>
+          <Text><Text style={styles.label}>Date last modified:</Text> {this.state["Date Modified"]}</Text>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Demographics</Text>
+          <Text><Text style={styles.label}>Missing age:</Text> {this.state["Missing Age"]}</Text>
+          <Text><Text style={styles.label}>Sex:</Text> {this.state["Sex"]}</Text>
+          <Text><Text style={styles.label}>Race:</Text> {this.state["Race / Ethnicity"]}</Text>
+        </View>
+        <View style={styles.namusButton}>
+          <Button
+            title='Open case on NamUs'
+            onPress={() => Linking.openURL('https://www.namus.gov/MissingPersons/Case#/'
+              + this.state.casenum.toString().replace('MP', ''))}
+          />
+        </View>
       </ScrollView>
     );
   }
@@ -58,11 +72,32 @@ export default class PersonScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    margin: 15,
+    backgroundColor: '#e4e4e4',
+    padding: 20,
   },
-  title: {
+  img: {
+    width: 200,
+    height: 200,
+  },
+  name: {
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+  section: {
+    backgroundColor: '#fff',
+    marginTop: 10,
+    padding: 20,
+  },
+  sectionTitle: {
+    marginBottom: 10,
+    color: '#15499b',
     fontSize: 20,
     fontWeight: 'bold',
   },
+  label: {
+    fontWeight: 'bold',
+  },
+  namusButton: {
+    marginTop: 20,
+  }
 });

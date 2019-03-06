@@ -1,5 +1,5 @@
 import pandas, csv, sqlite3, json
-from flask import Flask
+from flask import Flask, request
 
 ##### RUN THIS SERVER BY TYPING IN COMMAND LINE: FLASK_APP=server.py flask run
 
@@ -20,7 +20,6 @@ df.to_sql("missing_persons", conn, if_exists='append', index=False)
 # (For my reference) Column Names: ['Case Number', 'DLC', 'Last Name', 'First Name', 'Missing Age', 'City', 'County', 'State', 'Sex', 'Race / Ethnicity', 'Date Modified']
 
 ############################### FUNCTIONS RETURN DATA FROM MISSING PERSONS DATABASE ###################################################
-@app.route('/all-cases')
 def select_all_cases():
     """
     Query all rows in the tasks table
@@ -37,18 +36,37 @@ def select_all_cases():
 
     return return_json(get_columns(), rows)
 
-@app.route('/case-number')
-# TODO: figure out how to pass in parameters such as case_num or search_str
-def select_casenumber(case_num):
+@app.route('/all-cases')
+def select_all_name_age_location():
     """
-    Query row that matches case number
+    Query all rows in the tasks table
     :param conn: the Connection object
     :return:
     """
     cur = conn.cursor()
     result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"State\""
     schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
-    # statement = "SELECT * FROM missing_persons WHERE \"Case Number\" = " + case_n= 
+    statement = "SELECT " + result_schema + " FROM missing_persons"
+    cur.execute(statement)
+
+    rows = cur.fetchall()
+
+    for row in rows:
+        print(row)
+
+    return return_json(schema, rows)
+
+@app.route('/case-number')
+def select_casenumber():
+    """
+    Query row that matches case number
+    :param conn: the Connection object
+    :return:
+    """
+    case_num = '\"' + request.args.get('casenum') + '\"'
+    cur = conn.cursor()
+    result_schema = "\"Case Number\", \"DLC\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"County\", \"State\", \"Sex\", \"Race / Ethnicity\", \"Date Modified\""
+    schema = ["Case Number", "DLC", "Last Name", "First Name", "Missing Age", "City", "County", "State", "Sex", "Race / Ethnicity", "Date Modified"]
     statement = "SELECT " + result_schema + " FROM missing_persons WHERE \"Case Number\" = " + case_num
     cur.execute(statement)
 
