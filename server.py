@@ -7,13 +7,14 @@ from flask import Flask, request
 # Global set-up flask app
 app = Flask(__name__)
 
-# CSV file name
-# csvfile = "Los_Angeles_01-21-2019.16_14_43.csv"
-csvfile = "USA_01-21-2019.16_15_45.csv"
+# CSV file names
 
+csvfile = "USA_01-21-2019.16_15_45.csv"
+csvfile2 = "Los_Angeles_01-21-2019.16_14_43.csv"
 
 # Create a database connection using missing_persons data 
 df = pandas.read_csv(csvfile)
+df2 = pandas.read_csv(csvfile2)
 
 # (For my reference) Column Names: ['Case Number', 'DLC', 'Last Name', 'First Name', 'Missing Age', 'City', 'County', 'State', 'Sex', 'Race / Ethnicity', 'Date Modified']
 
@@ -50,6 +51,29 @@ def select_all_name_age_location():
     result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"State\""
     schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
     statement = "SELECT " + result_schema + " FROM missing_persons"
+    cur.execute(statement)
+
+    rows = cur.fetchall()
+
+    for row in rows:
+        print(row)
+
+    conn.close()
+    return return_json(schema, rows)
+
+@app.route('/los-angeles')
+def select_all_name_location_LA():
+    """
+    Query all rows in the tasks table for los-angeles specific location
+    :param conn: the Connection object
+    :return:
+    """
+    conn = sqlite3.connect(":memory:")
+    df2.to_sql("missing_persons_2", conn, if_exists='append', index=False)
+    cur = conn.cursor()
+    result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"City\""
+    schema = ["Case Number", "Last Name", "First Name", "City"]
+    statement = "SELECT " + result_schema + " FROM missing_persons_2"
     cur.execute(statement)
 
     rows = cur.fetchall()
