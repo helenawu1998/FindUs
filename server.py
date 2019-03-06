@@ -1,13 +1,27 @@
 import pandas, csv, sqlite3, json
+from flask import Flask
 
-# from flask import Flask
-# app = Flask(__name__)
+##### RUN THIS SERVER BY TYPING IN COMMAND LINE: FLASK_APP=server.py flask run
 
-# @app.route('/')
+############################### SET UP APP AND CONNECTIONS ###################################################
+# Global set-up flask app
+app = Flask(__name__)
 
-# Column Names: ['Case Number', 'DLC', 'Last Name', 'First Name', 'Missing Age', 'City', 'County', 'State', 'Sex', 'Race / Ethnicity', 'Date Modified']
+# CSV file name
+# csvfile = "Los_Angeles_01-21-2019.16_14_43.csv"
+csvfile = "USA_01-21-2019.16_15_45.csv"
 
-def select_all_cases(conn):
+
+# Create a database connection using missing_persons data 
+conn = sqlite3.connect(":memory:")
+df = pandas.read_csv(csvfile)
+df.to_sql("missing_persons", conn, if_exists='append', index=False)
+
+# (For my reference) Column Names: ['Case Number', 'DLC', 'Last Name', 'First Name', 'Missing Age', 'City', 'County', 'State', 'Sex', 'Race / Ethnicity', 'Date Modified']
+
+############################### FUNCTIONS RETURN DATA FROM MISSING PERSONS DATABASE ###################################################
+@app.route('/all-cases')
+def select_all_cases():
     """
     Query all rows in the tasks table
     :param conn: the Connection object
@@ -21,9 +35,11 @@ def select_all_cases(conn):
     for row in rows:
         print(row)
 
-    return rows
+    return return_json(get_columns(), rows)
 
-def select_casenumber(conn, case_num):
+@app.route('/case-number')
+# TODO: figure out how to pass in parameters such as case_num or search_str
+def select_casenumber(case_num):
     """
     Query row that matches case number
     :param conn: the Connection object
@@ -31,6 +47,7 @@ def select_casenumber(conn, case_num):
     """
     cur = conn.cursor()
     result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"State\""
+    schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
     # statement = "SELECT * FROM missing_persons WHERE \"Case Number\" = " + case_n= 
     statement = "SELECT " + result_schema + " FROM missing_persons WHERE \"Case Number\" = " + case_num
     cur.execute(statement)
@@ -40,9 +57,11 @@ def select_casenumber(conn, case_num):
     for row in rows:
         print(row)
 
-    return rows
+    return return_json(schema, rows)
 
-def select_searchstr(conn, col, search_str):
+@app.route('/search')
+# TODO: figure out how to pass in parameters such as case_num or search_str
+def select_searchstr(col, search_str):
     """
     Query row that contains the user-inputted search string in the user specified column
 
@@ -53,6 +72,7 @@ def select_searchstr(conn, col, search_str):
     """
     cur = conn.cursor()
     result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"State\""
+    schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
     if col == "Name":
         # Search for search string in last name, first name
         statement = "SELECT " + result_schema + " FROM missing_persons WHERE instr(\"Last Name\", \"" + search_str + "\") > 0 OR instr(\"First Name\", \"" + search_str + "\") > 0"
@@ -69,9 +89,11 @@ def select_searchstr(conn, col, search_str):
     for row in rows:
         print(row)
 
-    return rows
+    return return_json(schema, rows)
 
-def get_columns(conn):
+######################################### HELPER FUNCTIONS ###################################################
+
+def get_columns():
     """
     Query all rows in the tasks table
     :param conn: the Connection object
@@ -83,9 +105,9 @@ def get_columns(conn):
     print(names)
     return names
 
-def return_json(conn, schema, rows):
+def return_json(schema, rows):
     """
-    :query: rows (or list of tuples) relevant to given query
+    :query: schema is a list of of column names, and rows (or list of tuples) relevant to given query
     :return: JSON object
     """
     # names = get_columns(conn)
@@ -101,43 +123,43 @@ def return_json(conn, schema, rows):
     print(json.dumps(entries))
     return json.dumps(entries)
 
-def main():
-    # CSV file name
-    # csvfile = "Los_Angeles_01-21-2019.16_14_43.csv"
-    csvfile = "USA_01-21-2019.16_15_45.csv"
+# def main():
+#     # CSV file name
+#     # csvfile = "Los_Angeles_01-21-2019.16_14_43.csv"
+#     # csvfile = "USA_01-21-2019.16_15_45.csv"
 
-    # create a database connection
-    conn = sqlite3.connect(":memory:")
-    df = pandas.read_csv(csvfile)
-    df.to_sql("missing_persons", conn, if_exists='append', index=False)
-    # conn = create_connection(database)
-    with conn:
-        print("Getting column information...")
-        names = get_columns(conn)
+#     # create a database connection
+#     # conn = sqlite3.connect(":memory:")
+#     # df = pandas.read_csv(csvfile)
+#     # df.to_sql("missing_persons", conn, if_exists='append', index=False)
 
-        # print("Querying all cases...")
-        #rows = select_all_cases(conn)
+#     with conn:
+#         print("Getting column information...")
+#         names = get_columns()
 
-        print("Querying case that matches case number")
-        # Test specific case for Los Angeles dataset
-        # casenum = "\"MP26951\"" 
-        # Test specific case for USA dataset
-        casenum = "\"MP20931\"" 
-        rows = select_casenumber(conn, casenum)
+#         # print("Querying all cases...")
+#         #rows = select_all_cases(conn)
 
-        print("Querying case that matches search string ")
-        search_str = "Detr"
-        rows = select_searchstr(conn, "Location", search_str)
-        search_str = "arl"
-        rows = select_searchstr(conn, "Name", search_str)
-        search_str = "20"
-        rows = select_searchstr(conn, "Age", search_str)
+#         print("Querying case that matches case number")
+#         # Test specific case for Los Angeles dataset
+#         # casenum = "\"MP26951\"" 
+#         # Test specific case for USA dataset
+#         casenum = "\"MP20931\"" 
+#         rows = select_casenumber(casenum)
 
-        print("Printing last result as JSON")
-        # Need result schema as a list to turn collected rows into JSON properly
-        schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
-        json_msg = return_json(conn, schema, rows)
+#         print("Querying case that matches search string ")
+#         search_str = "Detr"
+#         rows = select_searchstr("Location", search_str)
+#         search_str = "arl"
+#         rows = select_searchstr("Name", search_str)
+#         #search_str = "20"
+#         #rows = select_searchstr("Age", search_str)
 
+#         print("Printing last result as JSON")
+#         # Need result schema as a list to turn collected rows into JSON properly
+#         schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
+#         json_msg = return_json(schema, rows)
 
 if __name__ == '__main__':
-    main()
+    # main()
+    app.run(debug=True)
