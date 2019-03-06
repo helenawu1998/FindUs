@@ -63,29 +63,28 @@ def get_columns(conn):
     print(names)
     return names
 
-def return_json(conn, rows):
+def return_json(conn, schema, rows):
     """
     :query: rows (or list of tuples) relevant to given query
     :return: JSON object
-    # TODO: return data as JSON
     """
-    names = get_columns(conn)
+    # names = get_columns(conn)
 
     entries = []
     # Match each field in row with columnname as dictionary
     for row in rows:
         row_entry = []
         for i, field in enumerate(row):
-            row_entry.append((names[i], field))
+            row_entry.append((schema[i], field))
         entries.append(dict(row_entry))
 
     print(json.dumps(entries))
     return json.dumps(entries)
 
 def main():
-    # database = "C:\\sqlite\db\pythonsqlite.db"
     # CSV file name
-    csvfile = "Los_Angeles_01-21-2019.16_14_43.csv"
+    # csvfile = "Los_Angeles_01-21-2019.16_14_43.csv"
+    csvfile = "USA_01-21-2019.16_15_45.csv"
 
     # create a database connection
     conn = sqlite3.connect(":memory:")
@@ -96,15 +95,21 @@ def main():
         print("Getting column information...")
         names = get_columns(conn)
 
-        # print("Querying all cases...")
-        # rows = select_all_cases(conn)
+        print("Querying all cases...")
+        rows = select_all_cases(conn)
 
         print("Querying case that matches case number")
-        casenum = "\"MP26951\""
+        # Test specific case for Los Angeles dataset
+        # casenum = "\"MP26951\"" 
+
+        # Test specific case for USA dataset
+        casenum = "\"MP20931\"" 
         rows = select_casenumber(conn, casenum)
 
         print("Printing all as JSON")
-        json_msg = return_json(conn, rows)
+        # Need result schema as a list to turn collected rows into JSON properly
+        schema = ["Case Number", "Last Name", "First Name", "City", "State"]
+        json_msg = return_json(conn, schema, rows)
 
 
 if __name__ == '__main__':
