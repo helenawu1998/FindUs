@@ -121,6 +121,21 @@ let markers = results.map(person => (
   ));
 
 export default class App extends React.Component {
+  state = {
+    searchResults: [],
+  }
+
+  componentDidMount() {
+    return fetch('http://127.0.0.1:5000/all-cases')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({searchResults: responseJson});
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
   static navigationOptions = {
     title: 'Map',
   };
