@@ -7,6 +7,7 @@ import MapScreen from '../screens/MapScreen';
 import SearchScreen from '../screens/SearchScreen';
 import IdKitsScreen from '../screens/IdKitsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import PersonScreen from '../screens/PersonScreen';
 
 const MapStack = createStackNavigator({
   Map: MapScreen,
@@ -28,6 +29,7 @@ MapStack.navigationOptions = {
 
 const SearchStack = createStackNavigator({
   Search: SearchScreen,
+  Person: PersonScreen,
 });
 
 SearchStack.navigationOptions = {
