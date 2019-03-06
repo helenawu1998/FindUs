@@ -92,20 +92,22 @@ var results = [
     ];
 
 function getCasesInLocation(persons, city){
-  const result = persons.filter(place => place.location === city);
+  const result = persons.filter(place => place["City"] === city);
   return result;
 }
 
-function randomCoordinates(city){
-  if(city === 'Los Angeles'){
-    const latL = 34.0;
-    const latH = 34.107;
-    const lngL = -118.330;
-    const lngH = -118.168;
-  }
+function randomLat(){
+  const latL = 34.0;
+  const latH = 34.107;
   const lat = Math.random() * (latH - latL) + (latL);
+  return lat;
+}
+
+function randomLng(){
+  const lngL = -118.330;
+  const lngH = -118.168;
   const lng = Math.random() * (lngH - lngL) + (lngL);
-  return {lat, lng};
+  return lng;
 }
 
 let markers = results.map(person => (
@@ -126,7 +128,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    return fetch('http://127.0.0.1:5000/all-cases')
+    return fetch('http://127.0.0.1:5000/los-angeles')
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({searchResults: responseJson});
@@ -142,6 +144,9 @@ export default class App extends React.Component {
 
   render() {
     const { navigate } = this.props.navigation;
+    let resultsAll = this.state.searchResults;
+
+    //let resultsLA = getCasesInLocation(this.state.searchResults, 'Los Angeles');
     return (
       <MapView
         style={{ flex: 1 }}
@@ -152,16 +157,16 @@ export default class App extends React.Component {
           longitudeDelta: 0.1421,
         }}
       >
-        {results.map(person => (
+        {resultsAll.map(person => (
           <MapView.Marker
-            key = {person.casenum}
+            key = {person["Case Number"]}
             coordinate={{
-              longitude: person.longitude, 
-              latitude: person.latitude,
+              latitude: randomLat('Los Angles'), 
+              longitude: randomLng('Los Angles'),
             }}
-            title={person.location}
-            description={person.name}
-            onPress = {() => navigate('Person', {casenum: person.casenum})}
+            title={person["City"]}
+            description={person["First Name"] + person["Last Name"]}
+            onPress = {() => navigate('Person', {casenum: person["Case Number"]})}
           />
           ))
         }
