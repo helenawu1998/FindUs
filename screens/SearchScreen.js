@@ -90,50 +90,20 @@ export default class SearchScreen extends React.Component {
     })
   };
 
+  componentDidMount() {
+    return fetch('http://127.0.0.1:5000/all-cases')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({searchResults: responseJson});
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+
   updateSearch = searchText => {
     var isSearchResults = searchText !== '';
-    var results = [
-      {
-        casenum: 1,
-        name: 'John Smith',
-        age: 36,
-        location: 'Los Angeles, CA',
-        imgUrl: '../assets/images/person-icon.png',
-      },
-      {
-        casenum: 2,
-        name: 'Jane Smith',
-        age: 35,
-        location: 'San Francisco, CA',
-        imgUrl: '../assets/images/person-icon.png',
-      },
-      {
-        casenum: 3,
-        name: 'Helena Wu',
-        age: 20,
-        location: 'Pasadena, CA',
-        imgUrl: '../assets/images/person-icon.png',
-      },
-      {
-        casenum: 4,
-        name: 'Pamela Zhang',
-        age: 20,
-        location: 'Pasadena, CA',
-        imgUrl: '../assets/images/person-icon.png',
-      },
-      {
-        casenum: 5,
-        name: 'Sharon Chen',
-        age: 20,
-        location: 'Pasadena, CA',
-        imgUrl: '../assets/images/person-icon.png',
-      },
-    ];
-    this.setState({
-      searchText: searchText,
-      isSearchResults: isSearchResults,
-      searchResults: results,
-    });
+    // TODO: implement search/filtering!
   };
 
   render() {
@@ -148,29 +118,26 @@ export default class SearchScreen extends React.Component {
           value={this.state.searchText}
         />
         <SearchBySelector toggleSelector={this.toggleSelector}/>
-        {
-          this.state.isSearchResults &&
-          <View>
-            <Text style={styles.searchTitle}>
-              Search for '{this.state.searchText}' by {this.state.searchBy}
-            </Text>
-            <FlatList
-              data={this.state.searchResults}
-              keyExtractor={(item, index) => item.name}
-              renderItem={
-                ({item}) =>
-                  <TouchableHighlight onPress={() => navigate('Person', {casenum: item.casenum})}>
-                    <SearchResultPerson
-                      name={item.name}
-                      age={item.age}
-                      location={item.location}
-                      imgUrl={item.imgUrl}
-                    />
-                  </TouchableHighlight>
-              }
-            />
-          </View>
-        }
+        <View>
+          <Text style={styles.searchTitle}>
+            Search for '{this.state.searchText}' by {this.state.searchBy}
+          </Text>
+          <FlatList
+            data={this.state.searchResults}
+            keyExtractor={(item, index) => item["Case Number"]}
+            renderItem={
+              ({item}) =>
+                <TouchableHighlight onPress={() => navigate('Person', {casenum: item["Case Number"]})}>
+                  <SearchResultPerson
+                    name={item["First Name"] + " " + item["Last Name"]}
+                    age={item["Missing Age"]}
+                    location={item["City"] + ", " + item["State"]}
+                    imgUrl='../assets/images/person-icon.png'
+                  />
+                </TouchableHighlight>
+            }
+          />
+        </View>
       </ScrollView>
     );
   }
@@ -179,7 +146,7 @@ export default class SearchScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#e4e4e4',
   },
   searchTitle: {
     margin: 15,
@@ -199,14 +166,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     paddingHorizontal: 8,
     paddingVertical: 5,
-    backgroundColor: '#f4f4f4',
+    backgroundColor: '#e4e4e4',
   },
   searchByOptionSelected: {
-    backgroundColor: '#ddd',
+    backgroundColor: '#fff',
   },
   /* Missing person list */
   personContainer: {
-    backgroundColor: '#eee',
+    backgroundColor: '#fff',
     marginHorizontal: 10,
     marginVertical: 4,
     paddingHorizontal: 14,
