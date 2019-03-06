@@ -10,3 +10,6 @@ Run the following commands at the root of the project:
 `npm install --save react-native-elements` 
 
 `npm start`
+
+#### Run server
+`FLASK_APP=server.py flask run`
