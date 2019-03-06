@@ -24,6 +24,8 @@ def select_all_cases():
     :param conn: the Connection object
     :return:
     """
+    conn = sqlite3.connect(":memory:")
+    df.to_sql("missing_persons", conn, if_exists='append', index=False)
     cur = conn.cursor()
     cur.execute("SELECT * FROM missing_persons")
 
@@ -32,6 +34,7 @@ def select_all_cases():
     for row in rows:
         print(row)
 
+    conn.close()
     return return_json(get_columns(), rows)
 
 @app.route('/all-cases')
