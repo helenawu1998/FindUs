@@ -9,6 +9,4 @@ Run the following commands at the root of the project:
 
 `npm install --save react-native-elements` 
 
-`npm install firebase --save`
-
 `npm start`
