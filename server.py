@@ -78,8 +78,7 @@ def select_casenumber():
     return return_json(schema, rows)
 
 @app.route('/search')
-# TODO: figure out how to pass in parameters such as case_num or search_str
-def select_searchstr(col, search_str):
+def select_searchstr():
     """
     Query row that contains the user-inputted search string in the user specified column
 
@@ -88,6 +87,8 @@ def select_searchstr(col, search_str):
     col: the column of the table to search
     :return:
     """
+    col = request.args.get('col')
+    search_str = request.args.get('query')
     cur = conn.cursor()
     result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"State\""
     schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]

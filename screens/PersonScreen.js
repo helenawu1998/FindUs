@@ -38,7 +38,7 @@ export default class PersonScreen extends React.Component {
   render() {
     return (
       <ScrollView style={styles.container}>
-        <View style={{justifyContent: 'center', alignItems: 'center',}}>
+        <View style={{justifyContent: 'center', alignItems: 'center', marginBottom: 10,}}>
           <Image source={require('../assets/images/person-icon.png')} style={styles.img}/>
           <Text style={styles.name}>{this.state["First Name"]} {this.state["Last Name"]}</Text>
           <Text>

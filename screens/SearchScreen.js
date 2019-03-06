@@ -75,7 +75,6 @@ class SearchBySelector extends React.Component {
 export default class SearchScreen extends React.Component {
   state = {
     searchText: '',
-    isSearchResults: false,
     searchResults: [],
     searchBy: 'Name',
   }
@@ -102,8 +101,27 @@ export default class SearchScreen extends React.Component {
   }
 
   updateSearch = searchText => {
-    var isSearchResults = searchText !== '';
-    // TODO: implement search/filtering!
+    this.setState({searchText: searchText});
+    if(searchText === '') {
+      fetch('http://127.0.0.1:5000/all-cases')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({searchResults: responseJson});
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    }
+    else {
+      fetch('http://127.0.0.1:5000/search?col=' + this.state.searchBy + '&query=' + this.state.searchText)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({searchResults: responseJson});
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    }
   };
 
   render() {
