@@ -1,12 +1,16 @@
 import React from 'react';
-import { Image, ScrollView, StyleSheet, View, Dimensions, } from 'react-native';
+import { Image, 
+  ScrollView, 
+  StyleSheet, 
+  View, 
+  Dimensions, 
+  TouchableHighlight,
+  FlatList,
+  Text, 
+} from 'react-native';
 import { MapView } from 'expo';
 import { SearchBar } from 'react-native-elements';
 import { Marker } from 'react-native-maps';
-import {
-  FlatList,
-  Text,
-} from 'react-native';
 
 // export default class MapScreen extends React.Component {
 //   static navigationOptions = {
@@ -92,6 +96,18 @@ function getCasesInLocation(persons, city){
   return result;
 }
 
+function randomCoordinates(city){
+  if(city === 'Los Angeles'){
+    const latL = 34.0;
+    const latH = 34.107;
+    const lngL = -118.330;
+    const lngH = -118.168;
+  }
+  const lat = Math.random() * (latH - latL) + (latL);
+  const lng = Math.random() * (lngH - lngL) + (lngL);
+  return {lat, lng};
+}
+
 let markers = results.map(person => (
   <MapView.Marker
     key = {person.casenum}
@@ -110,6 +126,7 @@ export default class App extends React.Component {
   };
 
   render() {
+    const { navigate } = this.props.navigation;
     return (
       <MapView
         style={{ flex: 1 }}
@@ -120,7 +137,19 @@ export default class App extends React.Component {
           longitudeDelta: 0.1421,
         }}
       >
-        {markers}
+        {results.map(person => (
+          <MapView.Marker
+            key = {person.casenum}
+            coordinate={{
+              longitude: person.longitude, 
+              latitude: person.latitude,
+            }}
+            title={person.location}
+            description={person.name}
+            onPress = {() => navigate('Person', {casenum: person.casenum})}
+          />
+          ))
+        }
       </MapView>
     );
   }
