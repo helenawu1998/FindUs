@@ -32,6 +32,25 @@ def select_all_cases(conn):
 
     return rows
 
+def select_casenumber(conn, case_num):
+    """
+    Query row that matches case number
+    :param conn: the Connection object
+    :return:
+    """
+    cur = conn.cursor()
+    result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"City\", \"State\""
+    # statement = "SELECT * FROM missing_persons WHERE \"Case Number\" = " + case_num
+    statement = "SELECT " + result_schema + " FROM missing_persons WHERE \"Case Number\" = " + case_num
+    cur.execute(statement)
+
+    rows = cur.fetchall()
+
+    for row in rows:
+        print(row)
+
+    return rows
+
 def get_columns(conn):
     """
     Query all rows in the tasks table
@@ -77,8 +96,12 @@ def main():
         print("Getting column information...")
         names = get_columns(conn)
 
-        print("Querying all cases...")
-        rows = select_all_cases(conn)
+        # print("Querying all cases...")
+        # rows = select_all_cases(conn)
+
+        print("Querying case that matches case number")
+        casenum = "\"MP26951\""
+        rows = select_casenumber(conn, casenum)
 
         print("Printing all as JSON")
         json_msg = return_json(conn, rows)
