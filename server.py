@@ -13,9 +13,7 @@ csvfile = "USA_01-21-2019.16_15_45.csv"
 
 
 # Create a database connection using missing_persons data 
-conn = sqlite3.connect(":memory:")
 df = pandas.read_csv(csvfile)
-df.to_sql("missing_persons", conn, if_exists='append', index=False)
 
 # (For my reference) Column Names: ['Case Number', 'DLC', 'Last Name', 'First Name', 'Missing Age', 'City', 'County', 'State', 'Sex', 'Race / Ethnicity', 'Date Modified']
 
@@ -43,6 +41,8 @@ def select_all_name_age_location():
     :param conn: the Connection object
     :return:
     """
+    conn = sqlite3.connect(":memory:")
+    df.to_sql("missing_persons", conn, if_exists='append', index=False)
     cur = conn.cursor()
     result_schema = "\"Case Number\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"State\""
     schema = ["Case Number", "Last Name", "First Name", "Missing Age", "City", "State"]
@@ -54,6 +54,7 @@ def select_all_name_age_location():
     for row in rows:
         print(row)
 
+    conn.close()
     return return_json(schema, rows)
 
 @app.route('/case-number')
@@ -63,6 +64,8 @@ def select_casenumber():
     :param conn: the Connection object
     :return:
     """
+    conn = sqlite3.connect(":memory:")
+    df.to_sql("missing_persons", conn, if_exists='append', index=False)
     case_num = '\"' + request.args.get('casenum') + '\"'
     cur = conn.cursor()
     result_schema = "\"Case Number\", \"DLC\", \"Last Name\", \"First Name\", \"Missing Age\", \"City\", \"County\", \"State\", \"Sex\", \"Race / Ethnicity\", \"Date Modified\""
@@ -75,6 +78,7 @@ def select_casenumber():
     for row in rows:
         print(row)
 
+    conn.close()
     return return_json(schema, rows)
 
 @app.route('/search')
@@ -87,6 +91,8 @@ def select_searchstr():
     col: the column of the table to search
     :return:
     """
+    conn = sqlite3.connect(":memory:")
+    df.to_sql("missing_persons", conn, if_exists='append', index=False)
     col = request.args.get('col')
     search_str = request.args.get('query')
     cur = conn.cursor()
@@ -108,6 +114,7 @@ def select_searchstr():
     for row in rows:
         print(row)
 
+    conn.close()
     return return_json(schema, rows)
 
 ######################################### HELPER FUNCTIONS ###################################################
@@ -181,4 +188,4 @@ def return_json(schema, rows):
 
 if __name__ == '__main__':
     # main()
-    app.run(debug=True)
+    app.run(debug=False)
