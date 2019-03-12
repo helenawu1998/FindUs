@@ -165,7 +165,7 @@ export default class App extends React.Component {
               longitude: randomLng('Los Angles'),
             }}
             title={person["City"]}
-            description={person["First Name"] + person["Last Name"]}
+            description={person["First Name"] + " "+ person["Last Name"]}
             onPress = {() => navigate('Person', {casenum: person["Case Number"]})}
           />
           ))

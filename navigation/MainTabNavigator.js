@@ -6,7 +6,6 @@ import TabBarIcon from '../components/TabBarIcon';
 import MapScreen from '../screens/MapScreen';
 import SearchScreen from '../screens/SearchScreen';
 import IdKitsScreen from '../screens/IdKitsScreen';
-import ProfileScreen from '../screens/ProfileScreen';
 import PersonScreen from '../screens/PersonScreen';
 
 const MapStack = createStackNavigator({
@@ -56,23 +55,8 @@ IdKitsStack.navigationOptions = {
   ),
 };
 
-const ProfileStack = createStackNavigator({
-  Profile: ProfileScreen,
-});
-
-ProfileStack.navigationOptions = {
-  tabBarLabel: 'Profile',
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'}
-    />
-  ),
-};
-
 export default createBottomTabNavigator({
   MapStack,
   SearchStack,
   IdKitsStack,
-  ProfileStack,
 });
